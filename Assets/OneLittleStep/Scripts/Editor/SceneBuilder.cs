@@ -42,12 +42,16 @@ namespace OneLittleStep.EditorTools
             Debug.Log("[OneLittleStep] Scene rebuilt at " + ScenePath);
         }
 
-        /// <summary>Adds the scene once, keeping any scenes that are already listed.</summary>
+        /// <summary>
+        /// Puts the scene first (so a device build opens the prototype) and keeps every scene that was already listed.
+        /// Running it again changes nothing.
+        /// </summary>
         public static void AddSceneToBuildSettings(string path)
         {
             var scenes = EditorBuildSettings.scenes.ToList();
-            if (scenes.Any(s => s.path == path)) return;
-            scenes.Add(new EditorBuildSettingsScene(path, true));
+            if (scenes.Count > 0 && scenes[0].path == path && scenes[0].enabled) return;
+            scenes.RemoveAll(s => s.path == path);
+            scenes.Insert(0, new EditorBuildSettingsScene(path, true));
             EditorBuildSettings.scenes = scenes.ToArray();
         }
 

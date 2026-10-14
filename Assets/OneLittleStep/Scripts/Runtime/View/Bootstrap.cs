@@ -103,6 +103,5 @@ namespace OneLittleStep
         }
 
         void OnApplicationQuit() => Save();
-
     }
 }

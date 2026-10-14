@@ -9,11 +9,14 @@ namespace OneLittleStep
         /// <summary>Set by QA capture to render the full frame when there is no real screen.</summary>
         public static bool IgnoreSafeArea;
 
+        /// <summary>QA hook: a normalised safe rect (e.g. to imitate a notch and gesture bar). Null on devices.</summary>
+        public static Rect? SimulatedNormalized;
+
         Rect lastSafe;
         Vector2Int lastScreen;
 
         void OnEnable() => Apply(true);
-        void Update() => Apply(false);
+        void Update() => Apply(SimulatedNormalized.HasValue);
 
         void Apply(bool force)
         {
@@ -27,6 +30,7 @@ namespace OneLittleStep
             var rt = (RectTransform)transform;
             var min = new Vector2(safe.xMin / screen.x, safe.yMin / screen.y);
             var max = new Vector2(safe.xMax / screen.x, safe.yMax / screen.y);
+            if (SimulatedNormalized.HasValue) { min = SimulatedNormalized.Value.min; max = SimulatedNormalized.Value.max; }
             rt.anchorMin = min;
             rt.anchorMax = max;
             rt.offsetMin = Vector2.zero;

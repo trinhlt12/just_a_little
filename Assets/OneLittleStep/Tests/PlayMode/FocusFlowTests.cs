@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -167,11 +168,46 @@ namespace OneLittleStep.Tests
             App.OpenOverlay(OverlayId.Settings);
             yield return null;
             yield return QaCapture.Shot("18_settings");
+            var cat = UnityEngine.Object.FindAnyObjectByType<CatView>().GetComponent<SpriteRenderer>();
+
+            // Animated by default: the idle loop changes frames within a few seconds.
+            var seen = new System.Collections.Generic.HashSet<Sprite>();
+            for (float t = 0; t < 3f; t += Time.unscaledDeltaTime) { seen.Add(cat.sprite); yield return null; }
+            Assert.Greater(seen.Count, 1, "idle cat animates normally");
+
             yield return Click(Texts.ReduceMotionOff);
             Assert.IsTrue(Model.Data.reduceMotion);
             Assert.IsNotNull(FindButton(Texts.ReduceMotionOn));
             yield return Click(Texts.Close);
             Assert.AreEqual(OverlayId.None, App.CurrentOverlay);
+
+            seen.Clear();
+            for (float t = 0; t < 3f; t += Time.unscaledDeltaTime) { seen.Add(cat.sprite); yield return null; }
+            Assert.AreEqual(1, seen.Count, "decorative animation stops");
+            App.Show(ScreenId.Duration);
+            Assert.AreEqual(1f, App.GetComponentsInChildren<CanvasGroup>().First(g => g.name == "Screen Duration").alpha, "no fade");
+            App.Show(ScreenId.Home);
+
+            // Survives a restart.
+            yield return QaCapture.LoadScene();
+            Assert.IsTrue(Model.Data.reduceMotion);
+        }
+
+        [UnityTest]
+        public IEnumerator NotchAndGestureBarKeepControlsInsideSafeArea()
+        {
+            yield return Click(Texts.StartLittle);
+            Type(Texts.TaskPlaceholder, "Đọc sách");
+            Type(Texts.StepPlaceholder, "Mở sách ra");
+            yield return Click(Texts.Continue);
+            yield return Click(Texts.Begin);
+            SafeAreaFitter.SimulatedNormalized = new Rect(0f, 0.035f, 1f, 0.905f);   // 6% notch, 3.5% gesture bar
+            yield return null;
+            yield return QaCapture.Shot("28_session_notch", 1080, 2340);
+            var safe = UnityEngine.Object.FindAnyObjectByType<SafeAreaFitter>().GetComponent<RectTransform>();
+            Assert.AreEqual(0.035f, safe.anchorMin.y, 1e-4);
+            Assert.AreEqual(0.94f, safe.anchorMax.y, 1e-4);
+            SafeAreaFitter.SimulatedNormalized = null;
         }
     }
 }
