@@ -13,5 +13,11 @@ namespace OneLittleStep.EditorTools
             AssetDatabase.SaveAssets();
             Debug.Log("[OneLittleStep] SetupProject done");
         }
+
+        public static void GenerateArt()
+        {
+            Art.ArtGenerator.GenerateAll();
+            AssetDatabase.SaveAssets();
+        }
     }
 }

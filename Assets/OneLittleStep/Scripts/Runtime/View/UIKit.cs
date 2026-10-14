@@ -96,7 +96,7 @@ namespace OneLittleStep
             {
                 img.sprite = sprite;
                 img.type = Image.Type.Sliced;
-                img.pixelsPerUnitMultiplier = 0.2f; // chunky pixel corners at screen resolution
+                img.pixelsPerUnitMultiplier = 0.6f; // pixel corners, still chunky at screen resolution
             }
             return img;
         }
@@ -175,7 +175,7 @@ namespace OneLittleStep
             {
                 img.sprite = sprite;
                 img.type = Image.Type.Sliced;
-                img.pixelsPerUnitMultiplier = 0.2f;
+                img.pixelsPerUnitMultiplier = 0.6f;
             }
             var btn = rt.gameObject.AddComponent<Button>();
             var label = Label(rt, text, style == ButtonStyle.Chip ? SmallSize : BodySize);
@@ -246,7 +246,7 @@ namespace OneLittleStep
             {
                 img.sprite = sprite;
                 img.type = Image.Type.Sliced;
-                img.pixelsPerUnitMultiplier = 0.25f;
+                img.pixelsPerUnitMultiplier = 0.7f;
             }
             var field = rt.gameObject.AddComponent<InputField>();
             var text = Label(rt, "", BodySize, Theme.Ink, multiline ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft);

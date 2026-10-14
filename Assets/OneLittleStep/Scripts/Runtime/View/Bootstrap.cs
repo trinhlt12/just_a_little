@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 namespace OneLittleStep
@@ -14,14 +15,28 @@ namespace OneLittleStep
         public Camera WorldCamera { get; private set; }
         public Canvas Canvas { get; private set; }
         public RectTransform SafeRoot { get; private set; }
+        public RoomView Room { get; private set; }
 
         void Awake()
         {
             Application.targetFrameRate = 60;
             WorldCamera = CameraRig.Ensure();
+            EnsureGlobalLight();
             EnsureEventSystem();
+            Room = RoomView.Create(transform);
             BuildCanvas();
             BuildPlaceholder();
+        }
+
+        /// <summary>Sprites use the 2D renderer's lit material; one global light keeps colours exactly as painted.</summary>
+        static void EnsureGlobalLight()
+        {
+            foreach (var l in FindObjectsByType<Light2D>(FindObjectsSortMode.None))
+                if (l.lightType == Light2D.LightType.Global) return;
+            var go = new GameObject("Global Light 2D");
+            var light = go.AddComponent<Light2D>();
+            light.lightType = Light2D.LightType.Global;
+            light.intensity = 1f;
         }
 
         static void EnsureEventSystem()
