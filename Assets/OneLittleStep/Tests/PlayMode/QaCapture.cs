@@ -34,9 +34,9 @@ namespace OneLittleStep.Tests
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
             canvas.worldCamera = cam;
             canvas.planeDistance = 5f;
+            canvas.sortingOrder = 1000;   // Overlay mode draws UI above sprites; keep that order in the capture
             cam.targetTexture = rt;
-            yield return null;
-            yield return null;
+            yield return new WaitForSecondsRealtime(0.25f);   // let screen fades finish
             Canvas.ForceUpdateCanvases();
             cam.Render();
             var prev = RenderTexture.active;
@@ -49,6 +49,7 @@ namespace OneLittleStep.Tests
             File.WriteAllBytes(Path.Combine(Folder, name + ".png"), tex.EncodeToPNG());
             cam.targetTexture = null;
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 10;
             Object.Destroy(tex);
             rt.Release();
             Debug.Log("[OneLittleStep] QA shot " + name);

@@ -16,6 +16,13 @@ namespace OneLittleStep
         public Canvas Canvas { get; private set; }
         public RectTransform SafeRoot { get; private set; }
         public RoomView Room { get; private set; }
+        public GameModel Model { get; private set; }
+        public AppController App { get; private set; }
+
+        /// <summary>Test hook: replaces the wall clock (UTC). Null in normal play.</summary>
+        public static System.Func<System.DateTime> ClockOverride;
+
+        static System.DateTime UtcNow() => ClockOverride != null ? ClockOverride() : System.DateTime.UtcNow;
 
         void Awake()
         {
@@ -25,7 +32,9 @@ namespace OneLittleStep
             EnsureEventSystem();
             Room = RoomView.Create(transform);
             BuildCanvas();
-            BuildPlaceholder();
+            Model = new GameModel(new SaveData(), UtcNow);
+            App = gameObject.AddComponent<AppController>();
+            App.Init(Model, Room, SafeRoot);
         }
 
         /// <summary>Sprites use the 2D renderer's lit material; one global light keeps colours exactly as painted.</summary>
@@ -67,17 +76,10 @@ namespace OneLittleStep
             SafeRoot.gameObject.AddComponent<SafeAreaFitter>();
         }
 
-        void BuildPlaceholder()
+        void OnApplicationPause(bool paused)
         {
-            var top = UIKit.Panel(SafeRoot, "Top", Theme.PanelSoft);
-            UIKit.DockTop(top.rectTransform, 200, 24);
-            var title = UIKit.Label(top.transform, "Một Chút Thôi", UIKit.TitleSize, Theme.Ink, TextAnchor.MiddleCenter, FontStyle.Bold);
-            UIKit.Stretch(title.rectTransform);
-
-            var bottom = UIKit.Panel(SafeRoot, "Bottom", Theme.PanelSoft);
-            UIKit.DockBottom(bottom.rectTransform, 260, 24);
-            UIKit.Column(bottom.rectTransform, 40, 16, TextAnchor.MiddleCenter);
-            UIKit.Button(bottom.transform, "Bắt đầu một chút", ButtonStyle.Primary, () => Debug.Log("[OneLittleStep] start"));
+            if (!paused && App != null) App.OnResumedFromBackground();
         }
+
     }
 }

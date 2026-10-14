@@ -130,7 +130,7 @@ namespace OneLittleStep
 
         public static LayoutElement Size(GameObject go, float height = -1, float width = -1, float flexW = -1)
         {
-            var le = go.GetComponent<LayoutElement>() ?? go.AddComponent<LayoutElement>();
+            if (!go.TryGetComponent<LayoutElement>(out var le)) le = go.AddComponent<LayoutElement>();
             if (height >= 0) { le.minHeight = height; le.preferredHeight = height; }
             if (width >= 0) { le.minWidth = width; le.preferredWidth = width; }
             if (flexW >= 0) le.flexibleWidth = flexW;
@@ -160,9 +160,7 @@ namespace OneLittleStep
             TextAnchor align = TextAnchor.MiddleCenter, FontStyle style = FontStyle.Normal)
         {
             var t = Label(parent, text, size, color, align, style);
-            t.verticalOverflow = VerticalWrapMode.Overflow;
-            var fit = t.gameObject.AddComponent<ContentSizeFitter>();
-            fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            t.verticalOverflow = VerticalWrapMode.Overflow; // the parent layout group sizes it to its preferred height
             return t;
         }
 
@@ -216,6 +214,31 @@ namespace OneLittleStep
             if (label) label.color = fg;
             // ColorTint multiplies the white image, so the block colours are the visible fill.
             btn.transition = Selectable.Transition.ColorTint;
+        }
+
+        /// <summary>Square button showing only an icon.</summary>
+        public static Button IconButton(Transform parent, string icon, System.Action onClick, float size)
+        {
+            var b = Button(parent, "", ButtonStyle.Secondary, onClick, size);
+            b.GetComponentInChildren<Text>().gameObject.SetActive(false);
+            var img = Icon(b.transform, icon, size * 0.55f);
+            var rt = img.rectTransform;
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+            return b;
+        }
+
+        /// <summary>Adds a small icon at the left edge of a text button.</summary>
+        public static Image ButtonIcon(Button b, string icon, float size = 56f)
+        {
+            var img = Icon(b.transform, icon, size);
+            var rt = img.rectTransform;
+            rt.anchorMin = rt.anchorMax = new Vector2(0, 0.5f);
+            rt.pivot = new Vector2(0, 0.5f);
+            rt.anchoredPosition = new Vector2(28, 0);
+            var label = b.GetComponentInChildren<Text>();
+            if (label) Stretch(label.rectTransform, 28 + size + 8, 20, 6, 6);
+            return img;
         }
 
         public static void SetText(Button b, string text)
