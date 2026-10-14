@@ -22,6 +22,11 @@ namespace OneLittleStep
         /// <summary>Test hook: replaces the wall clock (UTC). Null in normal play.</summary>
         public static System.Func<System.DateTime> ClockOverride;
 
+        /// <summary>Test hook: save folder. Null means Application.persistentDataPath.</summary>
+        public static string SaveFolderOverride;
+
+        public SaveStore Store { get; private set; }
+
         static System.DateTime UtcNow() => ClockOverride != null ? ClockOverride() : System.DateTime.UtcNow;
 
         void Awake()
@@ -32,9 +37,13 @@ namespace OneLittleStep
             EnsureEventSystem();
             Room = RoomView.Create(transform);
             BuildCanvas();
-            Model = new GameModel(new SaveData(), UtcNow);
+            Store = new SaveStore(SaveFolderOverride ?? Application.persistentDataPath);
+            Model = new GameModel(Store.Load(), UtcNow);
+            Model.Changed += Save;          // saved at state changes only, never per frame
             App = gameObject.AddComponent<AppController>();
             App.Init(Model, Room, SafeRoot);
+            if (Store.LastRecoveryNote != null) App.NotifySaveRecovered();
+            Save();
         }
 
         /// <summary>Sprites use the 2D renderer's lit material; one global light keeps colours exactly as painted.</summary>
@@ -76,10 +85,24 @@ namespace OneLittleStep
             SafeRoot.gameObject.AddComponent<SafeAreaFitter>();
         }
 
+        public void Save()
+        {
+            if (Store != null && Model != null) Store.Save(Model.Data);
+        }
+
         void OnApplicationPause(bool paused)
         {
-            if (!paused && App != null) App.OnResumedFromBackground();
+            if (App == null) return;
+            if (paused) Save();
+            else App.OnResumedFromBackground();
         }
+
+        void OnApplicationFocus(bool focused)
+        {
+            if (!focused) Save();
+        }
+
+        void OnApplicationQuit() => Save();
 
     }
 }

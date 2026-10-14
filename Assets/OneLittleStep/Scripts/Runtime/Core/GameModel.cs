@@ -12,6 +12,7 @@ namespace OneLittleStep
         readonly Func<DateTime> utcNow;
         public SaveData Data { get; }
         public FocusTimer Timer { get; }
+        public DecorService Decor { get; }
 
         /// <summary>Raised after any persisted state changed.</summary>
         public event Action Changed;
@@ -26,6 +27,8 @@ namespace OneLittleStep
             if (Data.wood < 0) Data.wood = 0;
             Timer = new FocusTimer(utcNow, Data.session);
             Data.session = Timer.Data;
+            Decor = new DecorService(Data, () => Timer.IsBusy);
+            Decor.Changed += Notify;
         }
 
         void Notify() => Changed?.Invoke();

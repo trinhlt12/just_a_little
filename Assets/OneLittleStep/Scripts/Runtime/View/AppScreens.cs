@@ -513,7 +513,7 @@ namespace OneLittleStep
             toastRt = panel.rectTransform;
             toastRt.anchorMin = toastRt.anchorMax = new Vector2(0.5f, 0.5f);   // over the room's back wall, clear of the cards
             toastRt.pivot = new Vector2(0.5f, 0.5f);
-            toastRt.sizeDelta = new Vector2(560, 112);
+            toastRt.sizeDelta = new Vector2(900, 128);
             panel.raycastTarget = false;
             var row = panel.gameObject.AddComponent<HorizontalLayoutGroup>();
             row.padding = new RectOffset(28, 28, 16, 16);
@@ -522,8 +522,11 @@ namespace OneLittleStep
             row.childControlWidth = true; row.childControlHeight = true;
             row.childForceExpandWidth = false; row.childForceExpandHeight = false;
             toastIcon = UIKit.Icon(panel.transform, "icon_wood", 64);
-            toastText = UIKit.Label(panel.transform, "", 40, Theme.Ink, TextAnchor.MiddleCenter, FontStyle.Bold);
-            UIKit.Size(toastText.gameObject, 80, 400);
+            toastText = UIKit.Label(panel.transform, "", 38, Theme.Ink, TextAnchor.MiddleCenter, FontStyle.Bold);
+            toastText.resizeTextForBestFit = true;
+            toastText.resizeTextMinSize = 24;
+            toastText.resizeTextMaxSize = 38;
+            UIKit.Size(toastText.gameObject, 96, 740);
             toastRt.gameObject.SetActive(false);
         }
     }

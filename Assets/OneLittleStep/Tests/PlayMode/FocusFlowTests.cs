@@ -21,11 +21,16 @@ namespace OneLittleStep.Tests
         {
             fakeNow = new DateTime(2026, 10, 14, 9, 0, 0, DateTimeKind.Utc);
             Bootstrap.ClockOverride = () => fakeNow;
+            QaCapture.FreshSaveFolder();
             yield return QaCapture.LoadScene();
         }
 
         [TearDown]
-        public void TearDown() => Bootstrap.ClockOverride = null;
+        public void TearDown()
+        {
+            Bootstrap.ClockOverride = null;
+            Bootstrap.SaveFolderOverride = null;
+        }
 
         static IEnumerator Advance(double seconds)
         {

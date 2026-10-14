@@ -16,8 +16,18 @@ namespace OneLittleStep.Tests
     {
         public static string Folder => Path.Combine(Directory.GetParent(Application.dataPath).FullName, "QA", "screens");
 
+        /// <summary>Points the game at an empty temporary save folder so tests never touch real player data.</summary>
+        public static string FreshSaveFolder()
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "ols_qa_" + System.Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(dir);
+            Bootstrap.SaveFolderOverride = dir;
+            return dir;
+        }
+
         public static IEnumerator LoadScene()
         {
+            if (Bootstrap.SaveFolderOverride == null) FreshSaveFolder();
             SafeAreaFitter.IgnoreSafeArea = true;
             SceneManager.LoadScene("OneLittleStep");
             yield return null;

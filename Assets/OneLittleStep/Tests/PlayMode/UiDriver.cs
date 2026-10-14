@@ -30,6 +30,19 @@ namespace OneLittleStep.Tests
             yield return null;
         }
 
+        public static IEnumerator ClickNamed(string objectName)
+        {
+            var b = Object.FindObjectsByType<Button>(FindObjectsSortMode.None)
+                .FirstOrDefault(x => x.isActiveAndEnabled && x.name == objectName);
+            Assert.IsNotNull(b, $"No visible '{objectName}' on {App.Current}");
+            b.onClick.Invoke();
+            yield return null;
+            yield return null;
+        }
+
+        public static bool IsVisible(string objectName) =>
+            Object.FindObjectsByType<Button>(FindObjectsSortMode.None).Any(x => x.isActiveAndEnabled && x.name == objectName);
+
         public static bool IsInteractable(string label)
         {
             var b = FindButton(label);

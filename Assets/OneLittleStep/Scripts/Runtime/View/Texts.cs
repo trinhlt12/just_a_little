@@ -78,6 +78,22 @@ namespace OneLittleStep
 
         public const string WoodGained = "+1 Gỗ";
 
+        public const string DecorTitle = "Trang trí";
+        public const string DecorDone = "Xong";
+        public const string DecorPickHint = "Chọn một món đồ bên dưới.";
+        public const string InStorage = "Trong kho";
+        public const string PlacedTag = "Đang đặt";
+        public const string ChooseSpot = "chạm ô sáng để đặt";
+        public const string NeedSurface = "cần đặt bàn hoặc tủ trước";
+        public const string StoreItem = "Cất vào kho";
+        public const string SaveRecovered = "Không đọc được dữ liệu cũ. Bản sao đã được giữ lại an toàn.";
+        public static string Price(int n) => $"{n} Gỗ";
+        public static string Unlock(int n) => $"Mở khóa · {n} Gỗ";
+        public static string NeedMore(int n) => $"Cần thêm {n} Gỗ";
+        public static string PlacedAt(string slot) => $"đang ở {slot.ToLowerInvariant()}";
+        public static string UnlockedItem(string name) => $"Đã mở khóa {name.ToLowerInvariant()}!";
+        public static string StoredItem(string name) => $"Đã cất {name.ToLowerInvariant()} vào kho.";
+
         public static string LittleBody(string step) => $"Bước “{step}” vẫn ở đây khi bạn quay lại.";
         public static string TaskDoneBody(string task) => $"“{task}” đã xong. Căn phòng nhỏ chúc mừng bạn.";
         public static string StayedWith(double seconds) => $"Bạn đã ở bên bước này {Duration(seconds)}.";
